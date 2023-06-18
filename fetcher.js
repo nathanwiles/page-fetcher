@@ -33,41 +33,49 @@ request(url, (error, response, body) => {
       output: process.stdout,
     });
 
+    // callback function to write file
+    const writeFile = () => {
+      // print confirmation messages
+      console.log(`Writing file to: ${path}`);
+      // write the file
+      fs.writeFile(path, body, (err) => {
+        if (err) {
+          // print error and exit if one occurred
+          console.log("File path not found:", path);
+          process.exit();
+        } else {
+          // print success message and exit
+          console.log(
+            `Downloaded and saved ${body.length} bytes to: ${path}\n`
+          );
+          process.exit();
+        }
+      });
+    };
+
     // check if file path already exists
     fs.access(path, fs.constants.F_OK, (err) => {
-      rl.question(
-        "File path already exists. Are you sure you want to overwrite? 'Y/N\n",
-        (answer) => {
-          if (answer === "N") {
-            console.log("File not overwritten.");
-            process.exit();
-          } else if (answer === "Y") {
-            // console.log confirmation messages
-            console.log("File will be overwritten.");
-            console.log(`Writing file to: ${path}`);
-            // write the file
-            fs.writeFile(path, body, (err) => {
-              if (err) {
-                // print error and exit if one occurred
-                console.log("File path not found:", path);
-                process.exit();
-              } else {
-                // print success message and exit
-                console.log(
-                  `Downloaded and saved ${body.length} bytes to: ${path}\n`
-                );
-                process.exit();
-              }
-            });
-          } else {
-            // print error and exit if invalid input
-            console.log("Invalid input.");
-            process.exit();
+      if (!err) {
+        rl.question(
+          "File path already exists. Are you sure you want to overwrite? 'Y/N\n",
+          (answer) => {
+            if (answer === "N") {
+              console.log("File not overwritten.");
+              process.exit();
+            } else if (answer === "Y") {
+              // console.log confirmation messages
+              console.log("File will be overwritten.");
+              writeFile();
+            } else {
+              console.log("Invalid input.");
+              process.exit();
+            }
+            rl.close();
           }
-
-          rl.close(); // close readline interface
-        }
-      );
+        );
+      } else {
+        writeFile();
+      }
     });
   }
 });
