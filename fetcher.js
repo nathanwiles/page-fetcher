@@ -59,10 +59,13 @@ request(url, (error, response, body) => {
         rl.question(
           "File path already exists. Are you sure you want to overwrite? 'Y/N\n",
           (answer) => {
-            if (answer === "N") {
+            // convert answer to uppercase
+            answer = answer.toUpperCase(); 
+            // check if user wants to overwrite file
+            if (answer[0] === "N") {
               console.log("File not overwritten.");
               process.exit();
-            } else if (answer === "Y") {
+            } else if (answer[0] === "Y") {
               // console.log confirmation messages
               console.log("File will be overwritten.");
               writeFile();
